@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,8 +15,29 @@ func root(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	// Response for correct request
-	w.Write([]byte("Tenis CCE - Belén"))
+	// Slice containing the paths to the two files. Note that the
+	// root.page.tmpl file must be the *first* file in the slice.
+	files := []string{
+		"./ui/html/root.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+	}
+	// template.ParseFiles() func. to read the template file into template set
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err.Error())
+		// http.Error() function to send a generic 500 Internal Server Error
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	// Execute() method on the template set to write the template content
+	// as the response body. The last parameter to Execute() represents
+	// dynamic data that we want to pass in, which for now we'll leave as nil.
+	err = ts.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
+
 }
 
 // Show session's information
@@ -34,7 +56,7 @@ func showSession(w http.ResponseWriter, r *http.Request) {
 	// response and write it to the http.ResponseWriter.
 	_, err = fmt.Fprintf(w, "Display tennis session with ID %d...", id)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 	}
 
 }

@@ -17,7 +17,7 @@ func main() {
 	// Start a TCP web server listening on PORT
 	// If http.ListenAndServe() returns an error we use the log.Fatal()
 	// function to log the error message and exit.
-	log.Printf("Starting server on %s", SERVICE)
+	log.Printf("Starting server at %s", SERVICE)
 	err := http.ListenAndServe(SERVICE, mux)
 	log.Fatal(err)
 }

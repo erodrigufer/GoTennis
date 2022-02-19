@@ -1,0 +1,24 @@
+{{define "base"}}
+<!doctype html>
+<html lang='en'>
+	<meta name="author" content="Eduardo Rodriguez">
+	<meta name="description" content="A time scheduling management website for 
+	a tennis court.">
+	
+	<head>
+		<meta charset='utf-8'>
+		<title>{{template "title" .}} - GoTennis</title>
+	</head>
+	<body>
+		<header>
+			<h1><a href='/'>Tennis bookings</a></h1>
+		</header>
+		<nav>
+		<a href='/'>Home</a>
+		</nav>
+		<section>
+			{{template "body" .}}
+		</section>
+	</body>
+</html>
+{{end}}
