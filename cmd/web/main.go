@@ -1,13 +1,24 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 )
 
+// store all flag-parseable config values in this struct
+type configValues struct {
+	addr string
+	//StaticDir string
+}
+
 func main() {
-	// Define HOST and PORT
-	SERVICE := "localhost:4000"
+	// Define default HOST and PORT, in case flag is not present
+	DEFAULT_SERVICE := "localhost:4000"
+
+	cfg := new(configValues)
+	flag.StringVar(&cfg.addr, "addr", DEFAULT_SERVICE, "Server listening address")
+	flag.Parse()
 	// Use the http.NewServeMux() function to initialize a new servemux, then
 	// register the root function as the handler for the "/" URL pattern.
 	mux := http.NewServeMux()
@@ -32,11 +43,11 @@ func main() {
 	// the fileServer
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	// Start a TCP web server listening on PORT
+	// Start a TCP web server listening on addr
 	// If http.ListenAndServe() returns an error we use the log.Fatal()
 	// function to log the error message and exit.
-	log.Printf("Starting server at %s", SERVICE)
-	err := http.ListenAndServe(SERVICE, mux)
+	log.Printf("Starting server at %s\n", cfg.addr)
+	err := http.ListenAndServe(cfg.addr, mux)
 	log.Fatal(err)
 }
 
