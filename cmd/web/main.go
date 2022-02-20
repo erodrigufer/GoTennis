@@ -46,7 +46,7 @@ func main() {
 	// Start a TCP web server listening on addr
 	// If http.ListenAndServe() returns an error we use the log.Fatal()
 	// function to log the error message and exit.
-	log.Printf("Starting server at %s\n", cfg.addr)
+	log.Printf("Starting server at %s", cfg.addr)
 	err := http.ListenAndServe(cfg.addr, mux)
 	log.Fatal(err)
 }
