@@ -20,6 +20,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./ui/html/root.page.tmpl",
 		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
 	}
 	// template.ParseFiles() func. to read the template file into template set
 	ts, err := template.ParseFiles(files...)
@@ -31,7 +32,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 	// Execute() method on the template set to write the template content
 	// as the response body. The last parameter to Execute() represents
-	// dynamic data that we want to pass in, which for now we'll leave as nil.
+	// dynamic data that we want to pass in
 	err = ts.Execute(w, nil)
 	if err != nil {
 		log.Println(err.Error())
