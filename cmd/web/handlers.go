@@ -11,7 +11,7 @@ import (
 func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// If URL request != "/" -> response HTTP 404
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	// Slice containing the paths to the two files. Note that the
@@ -24,9 +24,8 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// template.ParseFiles() func. to read the template file into template set
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		// http.Error() function to send a generic 500 Internal Server Error
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		// 500 Internal Server Error
+		app.serverError(w, err)
 		return
 	}
 	// Execute() method on the template set to write the template content
@@ -34,8 +33,9 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// dynamic data that we want to pass in
 	err = ts.Execute(w, nil)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		// 500 Internal Server Error
+		app.serverError(w, err)
+		return
 	}
 
 }
@@ -48,7 +48,7 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 	// id could be less than 1 if the query was wrong, since it will return nil
 	if err != nil || id < 1 {
 		// Reply to the request with a 404 Not Found error
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
@@ -56,7 +56,8 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 	// response and write it to the http.ResponseWriter.
 	_, err = fmt.Fprintf(w, "Display tennis session with ID %d...", id)
 	if err != nil {
-		app.errorLog.Println(err.Error())
+		// Internal Server Error
+		app.serverError(w, err)
 	}
 
 }
@@ -73,13 +74,9 @@ func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
 		// The error code must be sent in the header before the body, otherwise
 		// is the default header code http.StatusOK
 		// w.WriteHeader(http.StatusMethodNotAllowed)
-		// w.Write([]byte("Method Not Allowed"))
 
-		// Use the http.Error() function to send a 405 status code
-		// and "Method Not Allowed" string as the response body.
 		// This helper function replaces both calls to WriteHeader and Write
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 	w.Write([]byte("Create a new tennis session..."))
