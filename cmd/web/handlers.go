@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 )
 
 // Handler for root URL '/'
-func root(w http.ResponseWriter, r *http.Request) {
+func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// If URL request != "/" -> response HTTP 404
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -25,7 +24,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	// template.ParseFiles() func. to read the template file into template set
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		// http.Error() function to send a generic 500 Internal Server Error
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -35,14 +34,14 @@ func root(w http.ResponseWriter, r *http.Request) {
 	// dynamic data that we want to pass in
 	err = ts.Execute(w, nil)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 
 }
 
 // Show session's information
-func showSession(w http.ResponseWriter, r *http.Request) {
+func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 	// Get from the URL the string value for id and convert it to an integer
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	// The string to int convertion failed or the int is less than 1
@@ -57,13 +56,13 @@ func showSession(w http.ResponseWriter, r *http.Request) {
 	// response and write it to the http.ResponseWriter.
 	_, err = fmt.Fprintf(w, "Display tennis session with ID %d...", id)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 	}
 
 }
 
 // Use POST request to create a new tennis session
-func createSession(w http.ResponseWriter, r *http.Request) {
+func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
 	// check field 'Method' from http request
 	// if 'Method' is not POST, then send 405 error in the header 'Method not
 	// allowed
