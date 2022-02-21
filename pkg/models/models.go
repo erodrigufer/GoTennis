@@ -1,6 +1,6 @@
 package models
 
-import(
+import (
 	"errors"
 	"time"
 )
@@ -8,11 +8,9 @@ import(
 var ErrNoRecord = errors.New("models: no matching record found")
 
 type Session struct {
-	ID			int
-	Title		string
-	Content		string
-	Created		time.Time
-	Expires		time.Time
+	ID      int
+	Title   string
+	Content string
+	Created time.Time
+	Expires time.Time
 }
-
-
