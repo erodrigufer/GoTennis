@@ -1,15 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql" // the driver's init() function must be
+	// run so that it can register itself with "database/sql" nothing else is
+	// actually used from this packet, so if no underscore would be present the
+	// Go compiler would bring up an error
 )
 
 // store all flag-parseable config values in this struct
 type configValues struct {
 	addr string
+	dsn  string
 	//StaticDir string
 }
 
@@ -30,6 +37,9 @@ func main() {
 
 	cfg := new(configValues)
 	flag.StringVar(&cfg.addr, "addr", DEFAULT_SERVICE, "Server's listening address")
+	// dsn is needed to know how to connect to a db
+	// parseTime=true converts SQL TIME and DATE fields to Go time.Time objects
+	flag.StringVar(&cfg.dsn, "dsn", "web:password@/goTennis?parseTime=true", "DSN (Data Source Name) for MySQL db")
 	flag.Parse()
 
 	// Create a logger for INFO messages, the prefix "INFO" and a tab will be
@@ -40,6 +50,14 @@ func main() {
 	// Create an ERROR messages logger, addiotionally use the Lshortfile flag to
 	// display the file's name and line number for the error
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	// open a connection to a db connection pool
+	db, err := connectDBpool(cfg.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	// close connection pool before main() exits
+	defer db.Close()
 
 	// Initialize an instance of application containing the application-wide
 	// dependencies
@@ -65,6 +83,21 @@ func main() {
 	infoLog.Printf("Starting server at %s", cfg.addr)
 	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
+}
+
+// wrapper for sql.Open, return a sql.DB connection pool
+// dsn stands for data source name, and is needed to pass the authentication
+// information to the DB among other things
+func connectDBpool(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	// check if connection was established by pinging the db
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 // Eduardo Rodriguez @erodrigufer (c) 2022
