@@ -45,6 +45,6 @@ func (m *SessionModel) Get(id int) (*models.Session, error) {
 }
 
 // Return the 10 most recently created sessions
-func (m *Sessionmodel) Latest() ([]*models.Session, error) {
+func (m *SessionModel) Latest() ([]*models.Session, error) {
 	return nil, nil
 }
