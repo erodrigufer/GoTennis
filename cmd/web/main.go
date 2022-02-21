@@ -33,13 +33,14 @@ type application struct {
 
 func main() {
 	// Define default HOST and PORT, in case flag is not present
-	DEFAULT_SERVICE := "localhost:4000"
+	DEFAULT_SERVICE := ":4000"
 
 	cfg := new(configValues)
 	flag.StringVar(&cfg.addr, "addr", DEFAULT_SERVICE, "Server's listening address")
 	// dsn is needed to know how to connect to a db
+	// it is composed of ${USERNAME}:${PASSWORD}@/${DB_NAME}?${FLAGS}
 	// parseTime=true converts SQL TIME and DATE fields to Go time.Time objects
-	flag.StringVar(&cfg.dsn, "dsn", "web:password@/goTennis?parseTime=true", "DSN (Data Source Name) for MySQL db")
+	flag.StringVar(&cfg.dsn, "dsn", "web:Password1@/goTennis?parseTime=true", "DSN (Data Source Name) for MySQL db")
 	flag.Parse()
 
 	// Create a logger for INFO messages, the prefix "INFO" and a tab will be
@@ -81,13 +82,16 @@ func main() {
 	// function to log the error message and exit.
 	// ListenAndServe handles all accepted clients concurrently in goroutines
 	infoLog.Printf("Starting server at %s", cfg.addr)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
 
 // wrapper for sql.Open, return a sql.DB connection pool
 // dsn stands for data source name, and is needed to pass the authentication
 // information to the DB among other things
+// Troubleshooting: if the db service is not correctly active,
+// then running `ss -at` will not show the mysql db listening in localhost
+// at port `mysql`
 func connectDBpool(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
