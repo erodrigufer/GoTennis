@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/erodrigufer/GoTennis/pkg/models"
 )
 
 // Handler for root URL '/'
@@ -52,14 +54,20 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Use the fmt.Fprintf() function to interpolate the id value with our
-	// response and write it to the http.ResponseWriter.
-	_, err = fmt.Fprintf(w, "Display tennis session with ID %d...", id)
-	if err != nil {
-		// Internal Server Error
+	// Use the SessionModel object's Get method to retrieve the data for a
+	// specific record based on its ID. If no matching record is found,
+	// return a 404 Not Found response.
+	s, err := app.session.Get(id)
+	if err == models.ErrNoRecord {
+		app.notFound(w)
+		return
+		// another kind of error
+	} else if err != nil {
 		app.serverError(w, err)
+		return
 	}
-
+	// Write the snippet data as a plain-text HTTP response body.
+	fmt.Fprintf(w, "%v", s)
 }
 
 // Use POST request to create a new tennis session

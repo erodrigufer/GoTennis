@@ -41,10 +41,36 @@ func (m *SessionModel) Insert(title, content, expires string) (int, error) {
 
 // Get Session from db, using its id
 func (m *SessionModel) Get(id int) (*models.Session, error) {
-	return nil, nil
+	// SQL statement to execute
+	// use placeholder data ? for unsanitized user input
+	// the session should not have expired yet
+	stmt := `SELECT id, title, content, created, expires FROM sessions
+			    WHERE expires > UTC_TIMESTAMP() AND id = ?`
+	// Use the QueryRow() method on the connection pool to execute the
+	// SQL statement, passing in the untrusted id variable as the value for the
+	// placeholder parameter. This returns a pointer to a sql.Row object which
+	// holds the result from the database.
+	row := m.DB.QueryRow(stmt, id)
+	// Initialize a pointer to a new zeroed Session struct.
+	s := &models.Session{}
+	// Use row.Scan() to copy the values from each field in sql.Row to the
+	// corresponding field in the Session struct. Notice that the arguments
+	// to row.Scan are *pointers* to the place you want to copy the data into,
+	// and the number of arguments must be exactly the same as the number of
+	// columns returned by your statement. If the query returns no rows, then
+	// row.Scan() will return a sql.ErrNoRows error.
+	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNoRecord
+		// another kind of error happened
+	} else if err != nil {
+		return nil, err
+	}
+	// If everything went OK then return the Session object.
+	return s, nil
 }
 
 // Return the 10 most recently created sessions
-func (m *Sessionmodel) Latest() ([]*models.Session, error) {
+func (m *SessionModel) Latest() ([]*models.Session, error) {
 	return nil, nil
 }
