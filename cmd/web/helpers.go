@@ -10,7 +10,12 @@ import (
 // then send a generic 500 Internal Server Error response to the user
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	app.errorLog.Println(trace)
+	// the first parameter of Output equals the calldepth, which is the count
+	// of the number of frames to skip when computing the file name
+	// and line number. So basically, just go back on the stack trace to display
+	// the name of function (file) which called the error logging helper
+	// function
+	app.errorLog.Output(2, trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
