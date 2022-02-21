@@ -72,5 +72,53 @@ func (m *SessionModel) Get(id int) (*models.Session, error) {
 
 // Return the 10 most recently created sessions
 func (m *SessionModel) Latest() ([]*models.Session, error) {
-	return nil, nil
+	// SQL statement to execute
+	// Only get sessions that have not expired, ordered them by creation date
+	// and limit them to 10
+	stmt := `SELECT id, title, content, created, expires FROM sessions
+	    WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT 10`
+	// returns sql.Rows with result set for query
+	// this query does not need any more input parameters, since it always looks
+	// for the latest 10 results
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	// We defer rows.Close() to ensure the sql.Rows resultset is
+	// always properly closed before the Latest() method returns. This defer
+	// statement should come *after* you check for an error from the Query()
+	// method. Otherwise, if Query() returns an error, you'll get a panic
+	// trying to close a nil resultset.
+	defer rows.Close()
+	// Initialize an empty slice to hold the models.Session objects.
+	sessions := []*models.Session{}
+	// Use rows.Next to iterate through the rows in the resultset. This
+	// prepares the first (and then each subsequent) row to be acted on by the
+	// rows.Scan() method. If iteration over all the rows completes then the
+	// resultset automatically closes itself and frees-up the underlying
+	// database connection.
+	for rows.Next() {
+		// Create a pointer to a new zeroed Session struct.
+		s := &models.Session{}
+		// Use rows.Scan() to copy the values from each field in the row to the
+		// new Session object that we created. Again, the arguments to row.Scan
+		// must be pointers to the place you want to copy the data into, and
+		// the number of arguments must be exactly the same as the number of
+		// columns returned by your statement.
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+		// Append it to the slice of snippets.
+		sessions = append(sessions, s)
+	}
+	// When the rows.Next() loop has finished we call rows.Err() to retrieve an
+	// error that was encountered during the iteration. It's important to
+	// call this - don't assume that a successful iteration was completed
+	// over the whole resultset.
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	// If everything went OK then return the sessions slice.
+	return sessions, nil
 }
