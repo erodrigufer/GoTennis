@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/erodrigufer/GoTennis/pkg/models/mysql"
+
 	_ "github.com/go-sql-driver/mysql" // the driver's init() function must be
 	// run so that it can register itself with "database/sql" nothing else is
 	// actually used from this packet, so if no underscore would be present the
@@ -29,6 +31,7 @@ type configValues struct {
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	session  *mysql.SessionModel
 }
 
 func main() {
@@ -65,6 +68,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		session:  &mysql.SessionModel{DB: db},
 	}
 
 	// Get the mux from the method at routing.go
