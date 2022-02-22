@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -16,11 +17,21 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 		app.serverError(w, fmt.Errorf("The template %s does not exist", name))
 		return
 	}
+	// Initialize a buffer to first execute template into buffer, if there is an
+	// error, then the data will not be half-written to the client, but instead
+	// will remain in the buffer, and an Internal Server Error will be sent to
+	// the client. Something like this can happen, when there is an error in a
+	// template, then the Execute() method will return an error
+	buf := new(bytes.Buffer)
 	// Execute the template set, passing in any dynamic data
-	err := ts.Execute(w, dynamicData)
+	err := ts.Execute(buf, dynamicData)
 	if err != nil {
 		app.serverError(w, err)
+		return // Do not send the template back to the client
 	}
+	// There was no error while executing/rendering the template, so send the
+	// whole template back to the client
+	buf.WriteTo(w)
 }
 
 // Send error message and stack trace to error logger
