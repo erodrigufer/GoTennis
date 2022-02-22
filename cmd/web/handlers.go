@@ -16,6 +16,15 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+	// fetch the last sessions from database
+	s, err := app.session.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// Create an instance of the templateData struct holding the slice of
+	// the latest sessions
+	dynamicData := &templateData{Sessions: s}
 	// Slice containing the paths to the two files. Note that the
 	// root.page.tmpl file must be the *first* file in the slice.
 	files := []string{
@@ -33,7 +42,7 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// Execute() method on the template set to write the template content
 	// as the response body. The last parameter to Execute() represents
 	// dynamic data that we want to pass in
-	err = ts.Execute(w, nil)
+	err = ts.Execute(w, dynamicData)
 	if err != nil {
 		// 500 Internal Server Error
 		app.serverError(w, err)
@@ -67,6 +76,10 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// structure holding dynamic data passed on to the template for page
+	// generation
+	dynamicData := &templateData{Session: s}
+
 	// files to parse templates
 	files := []string{
 		"./ui/html/show.page.tmpl",
@@ -81,7 +94,7 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 	}
 	// execute templates, pass the Session object as the last parameter
 	// of Execute(), since it is dynamic data
-	err = ts.Execute(w, s)
+	err = ts.Execute(w, dynamicData)
 	if err != nil {
 		app.serverError(w, err)
 	}

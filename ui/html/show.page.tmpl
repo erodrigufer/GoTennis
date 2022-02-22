@@ -1,7 +1,8 @@
 {{template "base" .}}
 
-{{define "title"}}Session #{{.ID}}{{end}}
+{{define "title"}}Session #{{.Session.ID}}{{end}}
 {{define "body"}}
+{{with .Session}}
 <div class='snippet'>
 	<div class='metadata'>
 		<strong>{{.Title}}</strong>
@@ -13,4 +14,5 @@
 		<time>Expires: {{.Expires}}</time>
 	</div>
 </div>
+{{end}}
 {{end}}

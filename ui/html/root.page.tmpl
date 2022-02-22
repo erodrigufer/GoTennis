@@ -3,6 +3,24 @@
 {{define "title"}}Root{{end}}
 
 {{define "body"}}
-<h2>Free sessions</h2>
-<p>No content here yet!</p>
+<h2>Latest sessions</h2>
+{{if .Sessions}}
+	<table>
+		<tr>
+			<th>Title</th>
+			<th>Created</th>
+			<th>ID</th>
+		</tr>
+		{{range .Sessions}}
+		<tr>
+			<td><a href='/session?id={{.ID}}'>{{.Title}}</a></td>
+			<td>{{.Created}}</td>
+			<td>#{{.ID}}</td>
+		</tr>
+		{{end}}
+	</table>
+	{{else}}
+		<p>No content...</p>
+	{{end}}
+{{end}}
 {{end}}
