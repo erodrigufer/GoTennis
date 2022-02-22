@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -29,9 +30,10 @@ type configValues struct {
 // just defining these dependencies as global would not make the code easier to
 // unit-test
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	session  *mysql.SessionModel
+	errorLog      *log.Logger                   // error log handler
+	infoLog       *log.Logger                   // info log handler
+	session       *mysql.SessionModel           // db for application
+	templateCache map[string]*template.Template // Cache map with html templates
 }
 
 func main() {
@@ -63,12 +65,19 @@ func main() {
 	// close connection pool before main() exits
 	defer db.Close()
 
+	// Initialize the templates' cache
+	templateCache, err := newTemplateCache("./ui/html/")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	// Initialize an instance of application containing the application-wide
 	// dependencies
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		session:  &mysql.SessionModel{DB: db},
+		errorLog:      errorLog,
+		infoLog:       infoLog,
+		session:       &mysql.SessionModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	// Get the mux from the method at routing.go

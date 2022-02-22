@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -25,29 +24,9 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// Create an instance of the templateData struct holding the slice of
 	// the latest sessions
 	dynamicData := &templateData{Sessions: s}
-	// Slice containing the paths to the two files. Note that the
-	// root.page.tmpl file must be the *first* file in the slice.
-	files := []string{
-		"./ui/html/root.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
-	// template.ParseFiles() func. to read the template file into template set
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		// 500 Internal Server Error
-		app.serverError(w, err)
-		return
-	}
-	// Execute() method on the template set to write the template content
-	// as the response body. The last parameter to Execute() represents
-	// dynamic data that we want to pass in
-	err = ts.Execute(w, dynamicData)
-	if err != nil {
-		// 500 Internal Server Error
-		app.serverError(w, err)
-		return
-	}
+
+	// render page
+	app.render(w, r, "root.page.tmpl", dynamicData)
 
 }
 
@@ -80,24 +59,8 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 	// generation
 	dynamicData := &templateData{Session: s}
 
-	// files to parse templates
-	files := []string{
-		"./ui/html/show.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
-	// Parse the template files...
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	// execute templates, pass the Session object as the last parameter
-	// of Execute(), since it is dynamic data
-	err = ts.Execute(w, dynamicData)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	// render page
+	app.render(w, r, "show.page.tmpl", dynamicData)
 }
 
 // Use POST request to create a new tennis session
