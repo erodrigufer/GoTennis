@@ -5,13 +5,27 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
+
+// Add default dynamic data to a templateData object (passed to the function as
+// a pointer
+// It adds the current year to a field in the templateData object
+func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
+	if td == nil {
+		// if pointer is nil, create a new instance of templateData
+		td = &templateData{}
+	}
+	td.CurrentYear = time.Now().Year()
+	return td
+}
 
 // Retrieve the appropriate template set from the cache based on the page name
 // (like 'root.page.tmpl'). If no entry exists in the cache with the
 // provided name, call the serverError helper method
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, dynamicData *templateData) {
 	ts, ok := app.templateCache[name]
+	// the object did not exist in the cache map
 	if !ok {
 		// fmt.Errorf returns an object that fulfills the error interface
 		app.serverError(w, fmt.Errorf("The template %s does not exist", name))
@@ -24,7 +38,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	// template, then the Execute() method will return an error
 	buf := new(bytes.Buffer)
 	// Execute the template set, passing in any dynamic data
-	err := ts.Execute(buf, dynamicData)
+	err := ts.Execute(buf, app.addDefaultData(dynamicData, r))
 	if err != nil {
 		app.serverError(w, err)
 		return // Do not send the template back to the client

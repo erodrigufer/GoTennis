@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"github.com/erodrigufer/GoTennis/pkg/models"
 )
@@ -10,9 +11,21 @@ import (
 // Define a templateData type to act as the holding structure for
 // any dynamic data that we want to pass to our HTML templates
 type templateData struct {
-	Session *models.Session
-	// a slice of sessions, useful to store the latest sessions
-	Sessions []*models.Session
+	CurrentYear int
+	Session     *models.Session
+	Sessions    []*models.Session // a slice of sessions, useful to store the latest sessions
+}
+
+// Return a human readable representation of a time.Time object
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+// Initialize a template.FuncMap object in a global variable.
+// This is a string-keyed map which acts as a lookup between the names of of
+// custom template functions and the functions themselves
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
@@ -32,8 +45,11 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		// Extract the file name (like 'home.page.tmpl')
 		// and assign it to the name variable
 		name := filepath.Base(page)
-		// Parse the page template file in to a template set
-		ts, err := template.ParseFiles(page)
+		// Register the template.FuncMap template set before parsing the files
+		// First create an empty template set with template.New(), then register
+		// the custom template functions and finally parse the files
+		// Finally parse the page template file in to a template set
+		ts, err := template.New(name).Func(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
