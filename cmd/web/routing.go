@@ -4,7 +4,9 @@ import (
 	"net/http"
 )
 
-func (app *application) routes() *http.ServeMux {
+// Method to create mux, routing paths and initialize a secure header middleware
+// before routing requests with the mux
+func (app *application) routes() http.Handler {
 
 	// Use the http.NewServeMux() function to initialize a new servemux, then
 	// register the root app method as the handler for the "/" URL pattern.
@@ -33,5 +35,7 @@ func (app *application) routes() *http.ServeMux {
 	// the fileServer
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	return mux
+	// secureHeaders executes its instructions and then returns the next http
+	// Handler in the chain of events, in this case the mux
+	return secureHeaders(mux)
 }
