@@ -37,5 +37,5 @@ func (app *application) routes() http.Handler {
 
 	// secureHeaders executes its instructions and then returns the next http
 	// Handler in the chain of events, in this case the mux
-	return secureHeaders(mux)
+	return app.logRequest(secureHeaders(mux))
 }

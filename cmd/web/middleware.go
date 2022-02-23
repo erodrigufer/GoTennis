@@ -24,3 +24,14 @@ func secureHeaders(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+// Log every client's request.
+// Log IP address of client, protocol used, http method and requested URL
+func (app *application) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// r.RemoteAddr is the IP address of the client doing the request
+		app.infoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL)
+
+		next.ServeHTTP(w, r)
+	})
+}
