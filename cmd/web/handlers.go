@@ -68,7 +68,7 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 
 // Use GET request to get a form to do a POST request for a tennis session
 func (app *application) createSessionForm(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Create a new session..."))
+	app.render(w, r, "create.page.tmpl", nil)
 }
 
 // Use POST request to create a new tennis session
