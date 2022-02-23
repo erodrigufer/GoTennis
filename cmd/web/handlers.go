@@ -24,7 +24,7 @@ func (app *application) root(w http.ResponseWriter, r *http.Request) {
 	// Create an instance of the templateData struct holding the slice of
 	// the latest sessions
 	dynamicData := &templateData{Sessions: s}
-
+	panic("chromed")
 	// render page
 	app.render(w, r, "root.page.tmpl", dynamicData)
 

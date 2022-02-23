@@ -35,7 +35,10 @@ func (app *application) routes() http.Handler {
 	// the fileServer
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
+	// chain of middlewares being executed before the mux, e.g.
+	// a defer function to recover from a panic from within a client's connec.
+	// (the go routine for the client), a logger for all requests and then
 	// secureHeaders executes its instructions and then returns the next http
 	// Handler in the chain of events, in this case the mux
-	return app.logRequest(secureHeaders(mux))
+	return app.recoverPanic(app.logRequest(secureHeaders(mux)))
 }
