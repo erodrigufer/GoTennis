@@ -73,39 +73,29 @@ func (app *application) createSessionForm(w http.ResponseWriter, r *http.Request
 
 // Use POST request to create a new tennis session
 func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
-	// The following code is not necessary anymore if we are using pat (library)
-	// since it only sends POST requests to this method
 
-	// check field 'Method' from http request
-	// if 'Method' is not POST, then send 405 error in the header 'Method not
-	// allowed
-	//	if r.Method != "POST" {
-	//		// Set 'Allow' field in response header to POST, to tell the client
-	//		// which method(s) are valid
-	//		w.Header().Set("Allow", "POST")
-	//		// The error code must be sent in the header before the body, otherwise
-	//		// is the default header code http.StatusOK
-	//		// w.WriteHeader(http.StatusMethodNotAllowed)
-	//
-	//		// This helper function replaces both calls to WriteHeader and Write
-	//		app.clientError(w, http.StatusMethodNotAllowed)
-	//		return
-	//	}
-
-	// Create some variables holding dummy data
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi"
-	expires := "7"
-	// Pass the data to the Session.Insert() method, receiving the
-	// ID of the new record back
+	// First call r.ParseForm() which adds any data in POST request bodies
+	// to the r.PostForm map. This also works in the same way for PUT and PATCH
+	// requests. If there are any errors, we use our app.ClientError helper to
+	// send a 400 Bad Request response to the client
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	// Use the r.PostForm.Get() method to retrieve the relevant data fields
+	// from the r.PostForm map.
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	expires := r.PostForm.Get("expires")
+	// Create a new session record in the database using the form data.
 	id, err := app.session.Insert(title, content, expires)
 	if err != nil {
 		app.serverError(w, err)
-
 		return
 	}
-	// Redirect the user to the relevant page for the newly created page
-	// With the HTTP Status See Other, the request after the redirect on the
-	// client-side will be a GET method
+	// Redirect to the resource of the newly created tennis session
+	// The client's browser should then automatically redirect to the new
+	// resource
 	http.Redirect(w, r, fmt.Sprintf("/session/%d", id), http.StatusSeeOther)
 }
