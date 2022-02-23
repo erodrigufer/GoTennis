@@ -49,7 +49,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		// First create an empty template set with template.New(), then register
 		// the custom template functions and finally parse the files
 		// Finally parse the page template file in to a template set
-		ts, err := template.New(name).Func(functions).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
