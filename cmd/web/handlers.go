@@ -124,6 +124,7 @@ func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
 	// template page showing the errors and the previously submitted r.PostForm
 	// data
 	if len(errors) > 0 {
+		app.infoLog.Printf("%s - %s %s %s {{Invalid data received from POST request}} ", r.RemoteAddr, r.Proto, r.Method, r.URL)
 		app.render(w, r, "create.page.tmpl", &templateData{
 			FormErrors: errors,     // map with the data validation errors
 			FormData:   r.PostForm, // this is the previously submitted data
