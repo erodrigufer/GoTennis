@@ -124,7 +124,7 @@ func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
 	// text HTTP response and return fron the handler before inserting the data
 	// into the database
 	if len(errors) > 0 {
-		fmt.Fprintf(w, errors)
+		fmt.Fprint(w, errors)
 		return
 	}
 
