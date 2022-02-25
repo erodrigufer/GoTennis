@@ -120,11 +120,14 @@ func (app *application) createSession(w http.ResponseWriter, r *http.Request) {
 		errors["expires"] = "This field is invalid"
 	}
 
-	// If there are any errors with the data validation, dump them in a plain
-	// text HTTP response and return fron the handler before inserting the data
-	// into the database
+	// If there are any data validation errors, re-display the create.page.tmpl
+	// template page showing the errors and the previously submitted r.PostForm
+	// data
 	if len(errors) > 0 {
-		fmt.Fprint(w, errors)
+		app.render(w, r, "create.page.tmpl", &templateData{
+			FormErrors: errors,     // map with the data validation errors
+			FormData:   r.PostForm, // this is the previously submitted data
+		})
 		return
 	}
 
