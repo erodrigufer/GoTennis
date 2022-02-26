@@ -2,10 +2,10 @@ package main
 
 import (
 	"html/template"
-	"net/url"
 	"path/filepath"
 	"time"
 
+	"github.com/erodrigufer/GoTennis/pkg/forms"
 	"github.com/erodrigufer/GoTennis/pkg/models"
 )
 
@@ -15,10 +15,7 @@ type templateData struct {
 	CurrentYear int
 	Session     *models.Session
 	Sessions    []*models.Session // a slice of sessions, useful to store the latest sessions
-	FormData    url.Values        // submitted data to form when validation error occurs
-	// FormData has the type url.Values, which is the same underlying type as
-	// r.PostForm, which will make passing back the data to the form easier
-	FormErrors map[string]string // data validation errors
+	Form        *forms.Form
 }
 
 // Return a human readable representation of a time.Time object
