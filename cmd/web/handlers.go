@@ -59,17 +59,9 @@ func (app *application) showSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve the value for the "flash" key from the session data with the
-	// PopString() method; it also deletes the key and value from the session
-	// data, so it acts like a one-time fetch. If there is no matching key in
-	// the session data this method will return the empty string
-	flash := app.sessionManager.PopString(r, "flash")
-
 	// structure holding dynamic data passed on to the template for page
 	// generation
-	dynamicData := &templateData{Session: s,
-		Flash: flash,
-	}
+	dynamicData := &templateData{Session: s}
 
 	// render page
 	app.render(w, r, "show.page.tmpl", dynamicData)

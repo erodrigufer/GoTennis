@@ -9,14 +9,18 @@ import (
 )
 
 // Add default dynamic data to a templateData object (passed to the function as
-// a pointer
-// It adds the current year to a field in the templateData object
+// a pointer)
+// It adds the current year to a field in the templateData object, and any
+// flash messages managed through the user's session manager
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	if td == nil {
 		// if pointer is nil, create a new instance of templateData
 		td = &templateData{}
 	}
 	td.CurrentYear = time.Now().Year()
+
+	// Add any flash message (if it exists) to the template data
+	td.Flash = app.sessionManager.PopString(r, "flash")
 	return td
 }
 
