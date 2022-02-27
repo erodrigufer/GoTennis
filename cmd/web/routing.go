@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 	mux := pat.New()
 	mux.Get("/", app.sessionManager.Enable(http.HandlerFunc(app.root)))
 	mux.Get("/session/create", app.sessionManager.Enable(http.HandlerFunc(app.createSessionForm)))
-	mux.Post("/session/create", app.sessionmanager.Enable(http.HandlerFunc(app.createSession)))
+	mux.Post("/session/create", app.sessionManager.Enable(http.HandlerFunc(app.createSession)))
 	mux.Get("/session/:id", app.sessionManager.Enable(http.HandlerFunc(app.showSession)))
 
 	// Create a handler/fileServer for all files in the static directory

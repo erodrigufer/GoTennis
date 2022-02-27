@@ -80,7 +80,7 @@ func main() {
 
 	// Initialize a session manager, pass the secret key and configure the
 	// manager so that it always expires after 12 hours
-	sessionManager := sessions.New([]byte(*cfg.secret))
+	sessionManager := sessions.New([]byte(cfg.secret))
 	sessionManager.Lifetime = 12 * time.Hour
 
 	// Initialize an instance of application containing the application-wide
