@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/erodrigufer/GoTennis/pkg/models/mysql"
 
@@ -14,12 +15,14 @@ import (
 	// run so that it can register itself with "database/sql" nothing else is
 	// actually used from this packet, so if no underscore would be present the
 	// Go compiler would bring up an error
+	"github.com/golangcollege/sessions" // session manager
 )
 
 // store all flag-parseable config values in this struct
 type configValues struct {
-	addr string
-	dsn  string
+	addr   string
+	dsn    string
+	secret string
 	//StaticDir string
 }
 
@@ -30,10 +33,11 @@ type configValues struct {
 // just defining these dependencies as global would not make the code easier to
 // unit-test
 type application struct {
-	errorLog      *log.Logger                   // error log handler
-	infoLog       *log.Logger                   // info log handler
-	session       *mysql.SessionModel           // db for application
-	templateCache map[string]*template.Template // Cache map with html templates
+	errorLog       *log.Logger                   // error log handler
+	infoLog        *log.Logger                   // info log handler
+	sessionManager *sessions.Session             // session manager
+	session        *mysql.SessionModel           // db for application
+	templateCache  map[string]*template.Template // Cache map with html templates
 }
 
 func main() {
@@ -46,6 +50,9 @@ func main() {
 	// it is composed of ${USERNAME}:${PASSWORD}@/${DB_NAME}?${FLAGS}
 	// parseTime=true converts SQL TIME and DATE fields to Go time.Time objects
 	flag.StringVar(&cfg.dsn, "dsn", "web:Password1@/goTennis?parseTime=true", "DSN (Data Source Name) for MySQL db")
+	// Session secret (a random key) used to encrypt and authenticate session
+	// cookies. It should be 32 bytes long
+	flag.StringVar(&cfg.secret, "secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Session's secret key to encrypt and authenticate session cookies")
 	flag.Parse()
 
 	// Create a logger for INFO messages, the prefix "INFO" and a tab will be
@@ -71,13 +78,19 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// Initialize a session manager, pass the secret key and configure the
+	// manager so that it always expires after 12 hours
+	sessionManager := sessions.New([]byte(*cfg.secret))
+	sessionManager.Lifetime = 12 * time.Hour
+
 	// Initialize an instance of application containing the application-wide
 	// dependencies
 	app := &application{
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		session:       &mysql.SessionModel{DB: db},
-		templateCache: templateCache,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		session:        &mysql.SessionModel{DB: db},
+		sessionManager: sessionManager,
+		templateCache:  templateCache,
 	}
 
 	// Get the mux from the method at routing.go

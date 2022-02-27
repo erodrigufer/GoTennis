@@ -16,11 +16,15 @@ func (app *application) routes() http.Handler {
 	// dependencies (like the loggers) in every method without using global
 	// variables
 	// the routing uses clean URLs and is method-based
+	// Use a sessionManager to store and load session data in all routes that
+	// are dynamic, and might need access to the cookie-based session data
+	// The static paths do not need access to the session data, since they are
+	// stateless
 	mux := pat.New()
-	mux.Get("/", http.HandlerFunc(app.root))
-	mux.Get("/session/create", http.HandlerFunc(app.createSessionForm))
-	mux.Post("/session/create", http.HandlerFunc(app.createSession))
-	mux.Get("/session/:id", http.HandlerFunc(app.showSession))
+	mux.Get("/", app.sessionManager.Enable(http.HandlerFunc(app.root)))
+	mux.Get("/session/create", app.sessionManager.Enable(http.HandlerFunc(app.createSessionForm)))
+	mux.Post("/session/create", app.sessionmanager.Enable(http.HandlerFunc(app.createSession)))
+	mux.Get("/session/:id", app.sessionManager.Enable(http.HandlerFunc(app.showSession)))
 
 	// Create a handler/fileServer for all files in the static directory
 	// Type Dir implements the interface required by FileServer and makes the
