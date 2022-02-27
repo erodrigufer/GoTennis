@@ -13,6 +13,7 @@ import (
 // any dynamic data that we want to pass to our HTML templates
 type templateData struct {
 	CurrentYear int
+	Flash       string
 	Session     *models.Session
 	Sessions    []*models.Session // a slice of sessions, useful to store the latest sessions
 	Form        *forms.Form

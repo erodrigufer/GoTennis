@@ -6,8 +6,8 @@ import (
 	"github.com/bmizerany/pat"
 )
 
-// Method to create mux, routing paths and initialize a secure header middleware
-// before routing requests with the mux
+// Method to create mux, routing paths and initialize multiple middlewares,
+// before returning a servemux
 func (app *application) routes() http.Handler {
 
 	// Use the pat.New() function to initialize a new servemux, then
