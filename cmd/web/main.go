@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -94,14 +95,27 @@ func main() {
 		templateCache:  templateCache,
 	}
 
+	// Store the non-default TLS configuration settings
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
+		// the previous elliptic curves have assembly implementations as of
+		// Go 1.11, so they provide performance under heavy loads, other
+		// implementations might be too CPU intensive
+	}
+
 	// Get the mux from the method at routing.go
 	mux := app.routes()
 	// Initialize a new http.Server struct.
 	// Use errorLog for errors instead of default option
 	srv := &http.Server{
-		Addr:     cfg.addr,
-		ErrorLog: errorLog,
-		Handler:  mux,
+		Addr:         cfg.addr,         // address where server listens
+		ErrorLog:     errorLog,         // logger for errors
+		Handler:      mux,              // handler that receives the client after accept()
+		TLSConfig:    tlsConfig,        // server's TLS config preferences
+		IdleTimeout:  time.Minute,      // time after which inactive keep-alive connections will be closed
+		ReadTimeout:  5 * time.Second,  // max. time to read the header and body of a request in the server
+		WriteTimeout: 10 * time.Second, // close connection if data is still being written after this time since accepting the connection
 	}
 
 	// Start a TCP web server listening on addr
