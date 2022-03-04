@@ -1,2 +1,6 @@
 *.DS_Store
 *.swp
+
+# TLS certificates and private key, or anything inside the tls folder
+*.pem
+tls/
