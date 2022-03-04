@@ -20,9 +20,9 @@ import (
 
 // store all flag-parseable config values in this struct
 type configValues struct {
-	addr   string
-	dsn    string
-	secret string
+	addr   string // address where the server is listening
+	dsn    string // information to open a connection pool on a database
+	secret string // secret used to encrypt information of sessions
 	//StaticDir string
 }
 
@@ -82,6 +82,7 @@ func main() {
 	// manager so that it always expires after 12 hours
 	sessionManager := sessions.New([]byte(cfg.secret))
 	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Secure = true // enable TLS connection
 
 	// Initialize an instance of application containing the application-wide
 	// dependencies
@@ -106,9 +107,10 @@ func main() {
 	// Start a TCP web server listening on addr
 	// If ListenAndServe() returns an error we use the log.Fatal()
 	// function to log the error message and exit.
-	// ListenAndServe handles all accepted clients concurrently in goroutines
+	// ListenAndServeTLS handles all accepted clients concurrently in goroutines
+	// and handles the connection with the client in a secure way through https
 	infoLog.Printf("Starting server at %s", cfg.addr)
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
@@ -116,7 +118,7 @@ func main() {
 // dsn stands for data source name, and is needed to pass the authentication
 // information to the DB among other things
 // Troubleshooting: if the db service is not correctly active,
-// then running `ss -at` will not show the mysql db listening in localhost
+// then running `ss -at` will not show the mysql db listening on localhost
 // at port `mysql`
 func connectDBpool(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
