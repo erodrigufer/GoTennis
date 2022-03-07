@@ -11,7 +11,8 @@ If using Mac OS and having installed go through _brew_, run the following comman
 ```
 go run /usr/local/Cellar/go/<version>/libexec/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
 
-with <version> being the version number of Go in your computer 
+--host: where is the service being hosted (localhost, another IP)
+<version> is the version number of Go in your computer 
 ```
 
 
