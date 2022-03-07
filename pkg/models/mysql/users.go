@@ -3,7 +3,7 @@ package mysql
 import (
 	"database/sql"
 
-	"github.com/erodrigufer/goTennis/pkg/models"
+	"github.com/erodrigufer/GoTennis/pkg/models"
 )
 
 type UserModel struct {
