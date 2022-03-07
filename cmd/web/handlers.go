@@ -156,7 +156,7 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// Otherwise add a confirmation flash message to the session confirming that
 	// their signup worked and asking them to log in
-	app.session.Put(r, "flash", "Your signup was successful. Please log in.")
+	app.sessionManager.Put(r, "flash", "Your signup was successful. Please log in.")
 	// And redirect the user to the login page.
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
