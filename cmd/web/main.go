@@ -39,6 +39,7 @@ type application struct {
 	sessionManager *sessions.Session             // session manager
 	session        *mysql.SessionModel           // db for application
 	templateCache  map[string]*template.Template // Cache map with html templates
+	users          *mysql.UserModel              // user model inside users table (db)
 }
 
 func main() {
@@ -93,6 +94,7 @@ func main() {
 		session:        &mysql.SessionModel{DB: db},
 		sessionManager: sessionManager,
 		templateCache:  templateCache,
+		users:          &mysql.UserModel{DB: db},
 	}
 
 	// Store the non-default TLS configuration settings
