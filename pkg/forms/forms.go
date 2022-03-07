@@ -3,16 +3,26 @@ package forms
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 	"unicode/utf8"
 )
+
+// parse a regex pattern and compile the regexp to sanity check the format of an
+// email address. This returns a *regexp.Regexp object, or panics in the event
+// of an error. This is done once at runtime, and stores the compiled regular
+// expression object in a variable, which is more performant than re-compilling
+// the pattern with every request
+// One can find the regex to check email addresses at:
+// https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 // Create a custom Form struct, which anonymously embeds a url.Values object
 // (to hold the form data) and an Errors field to hold any validation errors
 // for the form data.
 type Form struct {
-	url.Values
-	Errors errors // type described in errors.go
+	url.Values        // values parsed from the POST request body
+	Errors     errors // type described in errors.go
 }
 
 // Define a New() function to initialize a custom Form struct,
@@ -69,4 +79,30 @@ func (f *Form) PermittedValues(field string, opts ...string) {
 // Implement a Valid method which returns true if there are no errors.
 func (f *Form) Valid() bool {
 	return len(f.Errors) == 0
+}
+
+// MinLength checks that a specific field in the form contains a minimum number
+// of characters (d). If the check fails, then it adds an appropriate message
+// to the form errors
+func (f *Form) MinLength(field string, d int) {
+	value := f.Get(field)
+	if value == "" {
+		return
+	}
+	if utf8.RuneCountInString(value) < d {
+		f.Errors.Add(field, fmt.Sprintf("This field is too short (minimum is %d characters.)", d))
+	}
+}
+
+// MatchesPattern checks that a specific field in the form matches a regular
+// expression. If the check fails then it adds the appropriate message to the
+// form errors.
+func (f *Form) MatchesPattern(field string, pattern *regexp.Regexp) {
+	value := f.Get(field)
+	if value == "" {
+		return
+	}
+	if !pattern.MatchString(value) {
+		f.Errors.Add(field, "This field is invalid")
+	}
 }
