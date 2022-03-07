@@ -25,6 +25,11 @@ func (app *application) routes() http.Handler {
 	mux.Get("/session/create", app.sessionManager.Enable(http.HandlerFunc(app.createSessionForm)))
 	mux.Post("/session/create", app.sessionManager.Enable(http.HandlerFunc(app.createSession)))
 	mux.Get("/session/:id", app.sessionManager.Enable(http.HandlerFunc(app.showSession)))
+	mux.Get("/user/signup", app.sessionManager.Enable(http.HandlerFunc(app.signupUserForm)))
+	mux.Post("/user/signup", app.sessionManager.Enable(http.HandlerFunc(app.signupUser)))
+	mux.Get("/user/login", app.sessionManager.Enable(http.HandlerFunc(app.loginUserForm)))
+	mux.Post("/user/login", app.sessionManager.Enable(http.HandlerFunc(app.loginUser)))
+	mux.Post("/user/logout", app.sessionManager.Enable(http.HandlerFunc(app.logoutUser)))
 
 	// Create a handler/fileServer for all files in the static directory
 	// Type Dir implements the interface required by FileServer and makes the
