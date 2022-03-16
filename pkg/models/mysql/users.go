@@ -53,7 +53,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	// If the data does not match the method returns the ErrInvalidCredentials
 	// error.
 	var id int
-	var hasedPassword []byte
+	var hashedPassword []byte
 	row := m.DB.QueryRow("SELECT id, hashed_password FROM users WHERE email = ?", email)
 	err := row.Scan(&id, &hashedPassword)
 	// given email not found in the db
@@ -66,7 +66,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	// type cast the password parameter to []byte
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	// the password is incorrect
-	if err == bcrypt.ErrMismatchedHashPassword {
+	if err == bcrypt.ErrMismatchedHashAndPassword {
 		return 0, models.ErrInvalidCredentials
 	} else if err != nil {
 		return 0, err
