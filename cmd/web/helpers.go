@@ -74,3 +74,10 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
+
+// check if the current session's user has been successfully authenticated,
+// if so, return its userID, if not return 0
+func (app *application) authenticatedUser(r *http.Request) int {
+	// if there is no "userID" in the session, the method returns 0
+	return app.sessionManager.GetInt(r, "userID")
+}
