@@ -58,3 +58,20 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// If the user is not authenticated, redirect the user to the login page
+		// and return from the middleware so that no subsequent handlers in the
+		// middleare chain are executed.
+		if app.authenticatedUser(r) == 0 {
+			http.Redirect(w, r, "/user/login", http.StatusFound)
+			// http.StatusFound (302) URI of requested resource has been changed
+			// temporarily
+			return // return so that other middlewares are not executed
+		}
+
+		// call the next handler in the chain if the user has been authenticated
+		next.ServeHTTP(w, r)
+	})
+}
