@@ -19,6 +19,10 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 		td = &templateData{}
 	}
 	// CSRF token is available in all templates per default
+	// The token for a particular request is embedded into the html, so that
+	// only the legitimate agent could get that token and actually responds
+	// with this token value as a hidden input field in all POST and 'non-safe'
+	// requests
 	td.CSRFToken = nosurf.Token(r)
 	// check if user has already been authenticated
 	td.AuthenticatedUser = app.authenticatedUser(r)
