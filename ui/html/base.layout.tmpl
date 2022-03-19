@@ -36,6 +36,11 @@
 			<div>
 				{{if .AuthenticatedUser}}
 					<form action='/user/logout' method='POST'>
+						<!-- Only the POST requests are protected against CSRF
+						since they are the only non-safe methods, the only
+						POST method in this page is the logout request, so it
+						is the only one that gets the CSRF Token -->
+						<input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
 						<button>Logout</button>
 					</form>
 				{{else}}

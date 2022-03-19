@@ -3,6 +3,7 @@
 {{define "title"}}Create a new session{{end}}
 	{{define "body"}}
 		<form action='/session/create' method='POST'>
+			<input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
 			{{with .Form}}
 			<div>
 				<label>Title:</label>
