@@ -59,6 +59,8 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
+// check if user is authenticated, if so serve next middleware in chain, if not
+// redirect user to '/user/login' and return from middleware
 func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the user is not authenticated, redirect the user to the login page
