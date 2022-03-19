@@ -10,13 +10,14 @@ import (
 )
 
 // Define a templateData type to act as the holding structure for
-// any dynamic data that we want to pass to our HTML templates
+// any dynamic data that is passeed to the HTML templates
 type templateData struct {
-	CurrentYear int
-	Flash       string
-	Session     *models.Session
-	Sessions    []*models.Session // a slice of sessions, useful to store the latest sessions
-	Form        *forms.Form
+	AuthenticatedUser int
+	CurrentYear       int
+	Flash             string
+	Session           *models.Session
+	Sessions          []*models.Session // a slice of sessions, useful to store the latest sessions
+	Form              *forms.Form
 }
 
 // Return a human readable representation of a time.Time object
