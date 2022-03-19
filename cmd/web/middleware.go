@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/justinas/nosurf" // anti-CSRF mechanisms
 )
 
 // This middleware sets two header values for all incoming server requests
@@ -76,4 +78,20 @@ func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler
 		// call the next handler in the chain if the user has been authenticated
 		next.ServeHTTP(w, r)
 	})
+}
+
+// Anti-CSRF middleware with a customized cookie with Secure, Path and HttpOnly
+// flags set
+func noSurf(next http.Handler) http.Handler {
+	// If the CSRF check succeeds, the "next" handler will be called
+	csrfHandler := nosurf.New(next)
+
+	// sets the cookie token used for the CSRF token
+	csrfHandler.SetBaseCookie(http.Cookie{
+		HttpOnly: true,
+		Path:     "/",
+		Secure:   true,
+	})
+
+	return csrfHandler
 }
