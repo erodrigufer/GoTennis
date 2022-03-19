@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// No row matching in db (no record matches db query)
 	ErrNoRecord = errors.New("models: no matching record found")
 	// Error for when a user tries to login in with an incorrect email address or
 	// password
