@@ -84,7 +84,9 @@ func main() {
 	// manager so that it always expires after 12 hours
 	sessionManager := sessions.New([]byte(cfg.secret))
 	sessionManager.Lifetime = 12 * time.Hour
-	sessionManager.Secure = true // enable TLS connection
+	sessionManager.Secure = true                      // enable TLS connection
+	sessionManager.SameSite = http.SameSiteStrictMode // read more about this on
+	// page 387 of Let's Go
 
 	// Initialize an instance of application containing the application-wide
 	// dependencies
