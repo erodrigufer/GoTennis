@@ -19,6 +19,13 @@ import (
 	"github.com/golangcollege/sessions" // session manager
 )
 
+// define a unique context key type, to avoid collisions with context key of
+// other 3rd party packages
+type contextKey string
+
+// Initialize a variable with the new custom type (type cast)
+var contextKeyUser = contextKey("user")
+
 // store all flag-parseable config values in this struct
 type configValues struct {
 	addr   string // address where the server is listening
