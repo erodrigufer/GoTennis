@@ -8,15 +8,16 @@ import (
 	"time"
 )
 
-// Add default dynamic data to a templateData object (passed to the function as
-// a pointer)
-// It adds the current year to a field in the templateData object, and any
-// flash messages managed through the user's session manager
+// Default data is automatically added every time a template is rendered to the
+// dynamic data being passed to the app.render method
+// Default data added: CurrentYear, Flash messages and AuthenticatedUser
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	if td == nil {
 		// if pointer is nil, create a new instance of templateData
 		td = &templateData{}
 	}
+	// check if user has already been authenticated
+	td.AuthenticatedUser = app.authenticatedUser(r)
 	td.CurrentYear = time.Now().Year()
 
 	// Add any flash message (if it exists) to the template data
