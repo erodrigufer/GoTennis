@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/justinas/nosurf"
 )
 
 // Default data is automatically added every time a template is rendered to the
@@ -16,6 +18,8 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 		// if pointer is nil, create a new instance of templateData
 		td = &templateData{}
 	}
+	// CSRF token is available in all templates per default
+	td.CSRFToken = nosurf.Token(r)
 	// check if user has already been authenticated
 	td.AuthenticatedUser = app.authenticatedUser(r)
 	td.CurrentYear = time.Now().Year()

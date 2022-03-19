@@ -13,6 +13,7 @@ import (
 // any dynamic data that is passeed to the HTML templates
 type templateData struct {
 	AuthenticatedUser int
+	CSRFToken         string
 	CurrentYear       int
 	Flash             string
 	Session           *models.Session
