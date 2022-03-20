@@ -1,4 +1,7 @@
 run :
 	go run ./cmd/web/*
 
-.PHONY : run
+compile: 
+	go build -o goTennis.bin ./cmd/web/* 
+
+.PHONY : run compile
