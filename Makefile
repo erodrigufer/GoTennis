@@ -4,4 +4,7 @@ run :
 compile: 
 	go build -o goTennis.bin ./cmd/web/* 
 
-.PHONY : run compile
+clean:
+	rm *.bin
+
+.PHONY : run compile clean
