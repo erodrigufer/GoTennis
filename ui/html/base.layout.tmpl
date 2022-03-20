@@ -41,7 +41,7 @@
 						POST method in this page is the logout request, so it
 						is the only one that gets the CSRF Token -->
 						<input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
-						<button>Logout</button>
+						<button>Logout ({{.AuthenticatedUser.Name}})</button>
 					</form>
 				{{else}}
 					<a href='/user/signup'>Signup</a>
