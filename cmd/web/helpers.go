@@ -87,7 +87,7 @@ func (app *application) notFound(w http.ResponseWriter) {
 
 // check if the current session's user has been successfully authenticated,
 // if so, return its user struct from the db data, if not return nil
-func (app *application) authenticatedUser(r *http.Request) int {
+func (app *application) authenticatedUser(r *http.Request) *models.User {
 	// return the value inside the context associated with the key
 	// 'contextKeyUser' and type-cast it to the models.User type/struct
 	// context have to be type-asserted, since they are stored as interface{}
