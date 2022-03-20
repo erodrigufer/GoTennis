@@ -71,7 +71,7 @@ func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler
 		// If the user is not authenticated, redirect the user to the login page
 		// and return from the middleware so that no subsequent handlers in the
 		// middleare chain are executed.
-		if app.authenticatedUser(r) == 0 {
+		if app.authenticatedUser(r) == nil {
 			http.Redirect(w, r, "/user/login", http.StatusFound)
 			// http.StatusFound (302) URI of requested resource has been changed
 			// temporarily
