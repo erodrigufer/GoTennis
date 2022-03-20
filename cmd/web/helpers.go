@@ -7,6 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/erodrigufer/GoTennis/pkg/models"
 	"github.com/justinas/nosurf"
 )
 
@@ -85,8 +86,14 @@ func (app *application) notFound(w http.ResponseWriter) {
 }
 
 // check if the current session's user has been successfully authenticated,
-// if so, return its userID, if not return 0
+// if so, return its user struct from the db data, if not return nil
 func (app *application) authenticatedUser(r *http.Request) int {
-	// if there is no "userID" in the session, the method returns 0
-	return app.sessionManager.GetInt(r, "userID")
+	// return the value inside the context associated with the key
+	// 'contextKeyUser' and type-cast it to the models.User type/struct
+	user, ok := r.Context().Value(contextKeyUser).(*models.User)
+	// type-cast failed
+	if !ok {
+		return nil
+	}
+	return user
 }
