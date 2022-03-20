@@ -21,15 +21,15 @@ func (app *application) routes() http.Handler {
 	// The static paths do not need access to the session data, since they are
 	// stateless
 	mux := pat.New()
-	mux.Get("/", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.root))))
-	mux.Get("/session/create", app.sessionManager.Enable(noSurf(app.requireAuthenticatedUser(http.HandlerFunc(app.createSessionForm)))))
-	mux.Post("/session/create", app.sessionManager.Enable(noSurf(app.requireAuthenticatedUser(http.HandlerFunc(app.createSession)))))
-	mux.Get("/session/:id", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.showSession))))
-	mux.Get("/user/signup", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.signupUserForm))))
-	mux.Post("/user/signup", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.signupUser))))
-	mux.Get("/user/login", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.loginUserForm))))
-	mux.Post("/user/login", app.sessionManager.Enable(noSurf(http.HandlerFunc(app.loginUser))))
-	mux.Post("/user/logout", app.sessionManager.Enable(noSurf(app.requireAuthenticatedUser(http.HandlerFunc(app.logoutUser)))))
+	mux.Get("/", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.root)))))
+	mux.Get("/session/create", app.sessionManager.Enable(noSurf(app.authenticate(app.requireAuthenticatedUser(http.HandlerFunc(app.createSessionForm))))))
+	mux.Post("/session/create", app.sessionManager.Enable(noSurf(app.authenticate(app.requireAuthenticatedUser(http.HandlerFunc(app.createSession))))))
+	mux.Get("/session/:id", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.showSession)))))
+	mux.Get("/user/signup", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.signupUserForm)))))
+	mux.Post("/user/signup", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.signupUser)))))
+	mux.Get("/user/login", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.loginUserForm)))))
+	mux.Post("/user/login", app.sessionManager.Enable(noSurf(app.authenticate(http.HandlerFunc(app.loginUser)))))
+	mux.Post("/user/logout", app.sessionManager.Enable(noSurf(app.authenticate(app.requireAuthenticatedUser(http.HandlerFunc(app.logoutUser))))))
 
 	// Create a handler/fileServer for all files in the static directory
 	// Type Dir implements the interface required by FileServer and makes the
