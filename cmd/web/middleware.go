@@ -102,6 +102,8 @@ func noSurf(next http.Handler) http.Handler {
 // Add user info stored in the db as a struct to the context of a request, if
 // the user is authenticated (logged in/userID can be found in the session) and
 // the db has info for a user with that userID (the user has not been deleted)
+// if not then pass the unchanged request with the original context to the other
+// handlers.
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check if a userID value Exists in the session. If the userID *is not
