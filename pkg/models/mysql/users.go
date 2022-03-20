@@ -76,7 +76,8 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	return id, nil
 }
 
-// Fetch details for a specific user based on its user ID
+// Fetch details for a specific user based on its userID (userID as input
+// parameter)
 func (m *UserModel) Get(id int) (*models.User, error) {
 	s := &models.User{}
 	stmt := `SELECT id, name, email, created FROM users WHERE id = ?`

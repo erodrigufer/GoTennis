@@ -99,33 +99,42 @@ func noSurf(next http.Handler) http.Handler {
 	return csrfHandler
 }
 
-//
+// Add user info stored in the db as a struct to the context of a request, if
+// the user is authenticated (logged in/userID can be found in the session) and
+// the db has info for a user with that userID (the user has not been deleted)
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Check if a userID value exists in the session. If this *isn't
-		// present* then call the next handler in the chain as normal.
+		// Check if a userID value Exists in the session. If the userID *is not
+		// present* then call the next handler in the chain as normal
 		exists := app.sessionManager.Exists(r, "userID")
+		// userID does not exist, call the next http.Handler
 		if !exists {
 			next.ServeHTTP(w, r)
 			return
 		}
 		// Fetch the details of the current user from the database. If
 		// no matching record is found, remove the (invalid) userID from
-		// their session and call the next handler in the chain as normal.
-		user, err := app.users.Get(app.session.GetInt(r, "userID"))
+		// their session and call the next handler in the chain as normal
+		user, err := app.users.Get(app.sessionManager.GetInt(r, "userID"))
+		// the user was eliminated from the db in the meantime, remove the
+		// userID from the session as well, and serve next http.Handler as usual
 		if err == models.ErrNoRecord {
-			app.session.Remove(r, "userID")
+			app.sessionManager.Remove(r, "userID")
 			next.ServeHTTP(w, r)
 			return
 		} else if err != nil {
 			app.serverError(w, err)
 			return
 		}
-		// Otherwise, we know that the request is coming from a valid,
-		// authenticated (logged in) user. We create a new copy of the
-		// request with the user information added to the request context, and
-		// call the next handler in the chain *using this new copy of the
-		// request*.
+		// Otherwise, the request is coming from a valid, authenticated
+		// (logged in) user. A new copy of the request is created with the user
+		// information added to the request context, and the next handler in
+		// the chain is called *using this new copy of the request*
+		// - r.Context() retrieves the existing context for request r
+		// - the method context.WithValue creates a new copy of the context from
+		// r.Context() and appends the struct data 'user' with the key
+		// 'contextKeyUser'
+		// - r.WithContext creates a copy of the request r with the new context
 		ctx := context.WithValue(r.Context(), contextKeyUser, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
