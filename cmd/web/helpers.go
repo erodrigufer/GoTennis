@@ -90,6 +90,8 @@ func (app *application) notFound(w http.ResponseWriter) {
 func (app *application) authenticatedUser(r *http.Request) int {
 	// return the value inside the context associated with the key
 	// 'contextKeyUser' and type-cast it to the models.User type/struct
+	// context have to be type-asserted, since they are stored as interface{}
+	// within the context
 	user, ok := r.Context().Value(contextKeyUser).(*models.User)
 	// type-cast failed
 	if !ok {
