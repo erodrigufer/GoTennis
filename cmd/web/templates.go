@@ -21,9 +21,13 @@ type templateData struct {
 	Form              *forms.Form
 }
 
-// Return a human readable representation of a time.Time object
+// Return a human readable representation of a time.Time object (at UTC)
 func humanDate(t time.Time) string {
-	return t.Format("02 Jan 2006 at 15:04")
+	if t.IsZero() {
+		return ""
+	}
+	// Convert time to UTC before formatting it
+	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
 // Initialize a template.FuncMap object in a global variable.
