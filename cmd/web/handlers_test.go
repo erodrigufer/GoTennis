@@ -83,3 +83,20 @@ func TestPing(t *testing.T) {
 		t.Errorf("exptected body to equal %q", "OK")
 	}
 }
+
+// Test ping handler with functions implemented in testutils
+func TestPing2(t *testing.T) {
+	// create mock dependencies needed to test server (i.e. loggers)
+	app := newTestApplication(t)
+	// create a new test server with routing
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+	// discard the header being received after test
+	statusCode, _, body := ts.get(t, "/ping")
+	if statusCode != http.StatusOK {
+		t.Errorf("expected %d; got %d", http.StatusOK, statusCode)
+	}
+	if string(body) != "OK" {
+		t.Errorf("expected body to equal %q", "OK")
+	}
+}
