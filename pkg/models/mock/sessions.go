@@ -16,6 +16,8 @@ var mockSession = &models.Session{
 
 type SessionModel struct{}
 
+// Insert a new session into the db, it returns the id of the newly inserted
+// row in the db
 func (m *SessionModel) Insert(title, content, expires string) (int, error) {
 	return 2, nil
 }
