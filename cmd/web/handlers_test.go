@@ -2,12 +2,13 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest" // package to test HTTP handlers
 	"testing"
 )
 
-func TestPing(t *testing.T) {
+func TestPingUnit(t *testing.T) {
 	// httptest.ResponseRecorder object can record response status code, headers
 	// and body
 	// create a new http.ResponseRecorder
@@ -38,5 +39,47 @@ func TestPing(t *testing.T) {
 	}
 	if string(body) != "OK" {
 		t.Errorf("expected body to equal %q", "OK")
+	}
+}
+
+// Test end-to-end integration of "/ping" routing, middleare and so on, with
+// ping handler
+func TestPing(t *testing.T) {
+	t.Parallel()
+	// Create a new instance of the application struct. For now, this just
+	// contains a couple of mock loggers (which discard anything written to
+	// them).
+	app := &application{
+		errorLog: log.New(ioutil.Discard, "", 0),
+		infoLog:  log.New(ioutil.Discard, "", 0),
+	}
+	// use the httptest.NewTLSServer() function to create a new test
+	// server, passing in the value returned by the app.routes() method as the
+	// handler for the server. This starts up a HTTPS server which listens on a
+	// randomly-chosen port of your local machine for the duration of the test.
+	ts := httptest.NewTLSServer(app.routes())
+	// Shut down the server and block until all outstanding requests of server
+	// are done
+	defer ts.Close()
+	// The network address that the test server is listening on is contained
+	// in the ts.URL field. We can use this along with the ts.Client().Get()
+	// method to make a GET /ping request against the test server. This
+	// returns a http.Response struct containing the response.
+	rs, err := ts.Client().Get(ts.URL + "/ping")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// We can then check the value of the response status code and body using
+	// the same code as before.
+	if rs.StatusCode != http.StatusOK {
+		t.Errorf("expected %d; got %d", http.StatusOK, rs.StatusCode)
+	}
+	defer rs.Body.Close()
+	body, err := ioutil.ReadAll(rs.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != "OK" {
+		t.Errorf("exptected body to equal %q", "OK")
 	}
 }
