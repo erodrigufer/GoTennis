@@ -165,6 +165,7 @@ func (app *application) loginUserForm(w http.ResponseWriter, r *http.Request) {
 		Form: forms.New(nil),
 	})
 }
+
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -193,10 +194,17 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/session/create", http.StatusSeeOther)
 }
 
+// log user out of session by removing its userID from the related user session
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 	// Remove the userID from the session data
 	app.sessionManager.Remove(r, "userID")
 	// Add a flash message indicating that the user has logged out
 	app.sessionManager.Put(r, "flash", "You have been logged out successfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// status check or uptime monitore of server
+func ping(w http.ResponseWriter, r *http.Request) {
+	// answer to a ping with "OK" as the response body
+	w.Write([]byte("OK"))
 }
