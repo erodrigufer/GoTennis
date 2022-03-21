@@ -11,7 +11,8 @@ import (
 )
 
 // This middleware sets two header values for all incoming server requests
-// These two header values should protect against XSS and clickjacking
+// These two header values should instruct the client's web browser to implement
+// some additional security measures to protect against XSS and clickjacking.
 func secureHeaders(next http.Handler) http.Handler {
 	// Explanation:
 	// http.HandlerFunc is a type that works as an adapter to allow a function f
