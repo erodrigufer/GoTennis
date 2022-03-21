@@ -12,7 +12,8 @@ type SessionModel struct {
 	DB *sql.DB
 }
 
-// Insert new session into the db
+// Insert new session into the db, if correct it returns the id of the newly
+// inserted session into the db
 func (m *SessionModel) Insert(title, content, expires string) (int, error) {
 	// SQL-command to execute, `` to write command over 2 lines for readability
 	// ? is a placeholder parameter, since we would otherwise be using untrusted
