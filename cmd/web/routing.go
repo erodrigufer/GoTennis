@@ -48,6 +48,9 @@ func (app *application) routes() http.Handler {
 	// the fileServer
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))
 
+	// Create routing for ping function to check uptime/status of server
+	mux.Get("/ping", http.HandlerFunc(ping))
+
 	// chain of middlewares being executed before the mux, e.g.
 	// a defer function to recover from a panic from within a client's connec.
 	// (the go routine for the client), a logger for all requests and then
