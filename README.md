@@ -1,5 +1,5 @@
 # GoTennis
-Web application entirely written in Go to handle the time scheduling in a tennis field.
+Web application entirely written in Go to handle the time scheduling on a tennis court.
 
 ## TLS Certificate
 Populate the `./tls/` directory with a self-signed certificate (or a certificate from a CA) and a private key for that certificate.
