@@ -1,3 +1,5 @@
+Web application entirely written in Go to handle the time scheduling in a tennis field.
+
 ## TLS Certificate
 Populate the `./tls/` directory with a self-signed certificate (or a certificate from a CA) and a private key for that certificate.
 
