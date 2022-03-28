@@ -1,0 +1,21 @@
+-- Create a new UTF-8 `goTennis` database
+CREATE DATABASE goTennis CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Switch to using the `goTennis` database
+USE goTennis;
+
+-- Create a `sessions` table.
+CREATE TABLE sessions (
+    id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	title VARCHAR(100) NOT NULL,
+	content TEXT NOT NULL,
+	created DATETIME NOT NULL,
+	expires DATETIME NOT NULL
+					);
+
+-- Add an index on the 'created' column.
+CREATE INDEX idx_sessions_created ON sessions(created);
+
+CREATE USER 'web'@'localhost';
+GRANT SELECT, INSERT ON goTennis.* TO 'web'@'localhost';
+ALTER USER 'web'@'localhost' IDENTIFIED BY 'Password1';
