@@ -10,7 +10,7 @@ import (
 )
 
 // Define a templateData type to act as the holding structure for
-// any dynamic data that is passeed to the HTML templates
+// any dynamic data that is passed to the HTML templates
 type templateData struct {
 	AuthenticatedUser *models.User
 	CSRFToken         string
